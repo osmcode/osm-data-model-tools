@@ -1,0 +1,31 @@
+---
+Checks: '*,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-type-static-cast-downcast,-fuchsia-*,-hicpp-no-array-decay,-readability-implicit-bool-cast,-readability-implicit-bool-conversion'
+#
+#  For a list of check options, see:
+#  https://clang.llvm.org/extra/clang-tidy/checks/list.html
+#
+#  Disabled checks:
+#
+#  cert-err58-cpp
+#    Very theoretical problem.
+#
+#  cppcoreguidelines-pro-bounds-array-to-pointer-decay
+#    Limited use and many false positives including for all asserts.
+#
+#  cppcoreguidelines-pro-type-static-cast-downcast
+#    This is needed and totally okay if we are sure about the types.
+#
+#  fuchsia-*
+#    Much too strict.
+#
+#  hicpp-no-array-decay
+#    Alias for cppcoreguidelines-pro-bounds-array-to-pointer-decay.
+#
+#  readability-implicit-bool-cast
+#    Old name for readability-implicit-bool-conversion.
+#
+#  readability-implicit-bool-conversion
+#    I don't think this makes the code more readable.
+#
+#WarningsAsErrors: '*'
+...
