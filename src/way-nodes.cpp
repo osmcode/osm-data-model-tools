@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
                 if (way.nodes().empty()) {
                     continue;
                 }
-                auto it = way.nodes().begin();
+                const auto *it = way.nodes().begin();
                 if (way.is_closed()) {
                     ++it;
                 }

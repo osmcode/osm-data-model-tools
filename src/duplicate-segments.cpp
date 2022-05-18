@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
                 if (way.nodes().empty()) {
                     continue;
                 }
-                auto it = way.nodes().begin();
+                const auto *it = way.nodes().begin();
                 if (way.is_closed()) {
                     ++it;
                 }
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
     while (const auto buffer = reader2.read()) {
         for (const auto& way : buffer.select<osmium::Way>()) {
             if (way.nodes().size() > 1) {
-                auto it = way.nodes().begin();
+                const auto *it = way.nodes().begin();
                 for (++it; it != way.nodes().end(); ++it) {
                     const auto id1 = (it - 1)->ref();
                     const auto id2 = it->ref();
