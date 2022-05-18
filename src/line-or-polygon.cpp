@@ -36,8 +36,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <string>
 #include <unordered_map>
 
-static bool debug = false;
-
 enum class lptype {
     unclassified,
     unknown,
@@ -98,7 +96,7 @@ lptype check_tag(const osmium::Tag& tag) noexcept {
     return lptype::unknown;
 }
 
-lptype get_type(const osmium::TagList& tags, std::vector<std::string>* unknown_keys) {
+lptype get_type(const osmium::TagList& tags, std::vector<std::string>* unknown_keys, bool debug) {
     auto type = lptype::unclassified;
 
     for (const auto& tag : tags) {
@@ -189,6 +187,7 @@ int main(int argc, char* argv[]) {
     std::string input_filename;
     std::string expressions_directory{"."};
     std::string output_directory{"."};
+    bool debug = false;
     bool help = false;
 
     const auto cli
@@ -260,7 +259,7 @@ int main(int argc, char* argv[]) {
                         std::cerr << "WAY " << way.id() << '\n';
                     }
                     std::vector<std::string> unknown_keys;
-                    auto type = get_type(way.tags(), &unknown_keys);
+                    auto type = get_type(way.tags(), &unknown_keys, debug);
                     switch (type) {
                         case lptype::unclassified:
                             ++count_no_tags;
