@@ -29,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <osmium/tags/tags_filter.hpp>
 #include <osmium/visitor.hpp>
 
-#include <clara.hpp>
+#include <lyra.hpp>
 
 #include <iostream>
 #include <string>
@@ -107,19 +107,19 @@ int main(int argc, char* argv[]) {
     bool help = false;
 
     const auto cli
-        = clara::Opt(output_filename, "OUTPUT-FILE")
+        = lyra::opt(output_filename, "OUTPUT-FILE")
             ["-o"]["--output"]
             ("output file")
-        | clara::Opt(filter_filename, "FILTER-FILE")
+        | lyra::opt(filter_filename, "FILTER-FILE")
             ["-e"]["--expressions"]
             ("filter expressions file")
-        | clara::Help(help)
-        | clara::Arg(input_filename, "FILENAME")
+        | lyra::help(help)
+        | lyra::arg(input_filename, "FILENAME")
             ("input file");
 
-    const auto result = cli.parse(clara::Args(argc, argv));
+    const auto result = cli.parse(lyra::args(argc, argv));
     if (!result) {
-        std::cerr << "Error in command line: " << result.errorMessage() << '\n';
+        std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
     }
 

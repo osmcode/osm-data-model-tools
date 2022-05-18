@@ -48,6 +48,9 @@ You need a C++17 compliant compiler. You also need the following libraries:
         Fedora/CentOS: cmake
         openSUSE: cmake
 
+The programs use the [Lyra library](https://github.com/bfgroup/Lyra) for
+parsing the command line options. It is included in the `external` directory.
+
 ## Building
 
 These programs uses CMake for their builds. On Linux and macOS you can build as

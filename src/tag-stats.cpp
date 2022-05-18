@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <osmium/io/any_input.hpp>
 
-#include <clara.hpp>
+#include <lyra.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -40,22 +40,22 @@ int main(int argc, char* argv[]) {
     bool help = false;
 
     const auto cli
-        = clara::Opt(max_tags, "N")
+        = lyra::opt(max_tags, "N")
             ["-m"]["--max-tags"]
             ("count tags only on objects with no more than this many tags (default: all)")
-        | clara::Opt(min_count, "N")
+        | lyra::opt(min_count, "N")
             ["-c"]["--min-count"]
             ("min count to output (default: " + std::to_string(min_count) + ")")
-        | clara::Opt(with_values)
+        | lyra::opt(with_values)
             ["-v"]["--with-values"]
             ("also count values")
-        | clara::Help(help)
-        | clara::Arg(input_filename, "FILENAME")
+        | lyra::help(help)
+        | lyra::arg(input_filename, "FILENAME")
             ("input file");
 
-    const auto result = cli.parse(clara::Args(argc, argv));
+    const auto result = cli.parse(lyra::args(argc, argv));
     if (!result) {
-        std::cerr << "Error in command line: " << result.errorMessage() << '\n';
+        std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
     }
 

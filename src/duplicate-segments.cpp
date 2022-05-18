@@ -26,7 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <osmium/io/any_output.hpp>
 #include <osmium/util/verbose_output.hpp>
 
-#include <clara.hpp>
+#include <lyra.hpp>
 
 #include <algorithm>
 #include <cstdlib>
@@ -76,16 +76,16 @@ int main(int argc, char* argv[]) {
     bool help = false;
 
     const auto cli
-        = clara::Opt(output_directory, "DIR")
+        = lyra::opt(output_directory, "DIR")
             ["-o"]["--output-dir"]
             ("output directory")
-        | clara::Help(help)
-        | clara::Arg(input_filename, "FILENAME")
+        | lyra::help(help)
+        | lyra::arg(input_filename, "FILENAME")
             ("input file");
 
-    const auto result = cli.parse(clara::Args(argc, argv));
+    const auto result = cli.parse(lyra::args(argc, argv));
     if (!result) {
-        std::cerr << "Error in command line: " << result.errorMessage() << '\n';
+        std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
     }
 
