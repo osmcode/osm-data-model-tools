@@ -181,6 +181,10 @@ void count_keys(const std::vector<std::string>& unknown_keys) {
     }
 }
 
+static uint64_t percent(std::uint64_t fraction, std::uint64_t all) noexcept {
+    return fraction * 100 / all;
+}
+
 int main(int argc, char* argv[]) {
     std::string input_filename;
     std::string expressions_directory{"."};
@@ -298,12 +302,12 @@ int main(int argc, char* argv[]) {
     std::cout << "Statistics:"
               << "\n  non-closed: "  << count_nonclosed
               << "\n  closed:     "  << count_closed      << " (100%)"
-              << "\n    unknown:    " << count_unknown    << " (" << (count_unknown    * 100 / count_closed)
-              << "%)\n    linestring: " << count_linestring << " (" << (count_linestring * 100 / count_closed)
-              << "%)\n    polygon:    " << count_polygon    << " (" << (count_polygon    * 100 / count_closed)
-              << "%)\n    both:       " << count_both       << " (" << (count_both       * 100 / count_closed)
-              << "%)\n    no tags:    " << count_no_tags    << " (" << (count_no_tags    * 100 / count_closed)
-              << "%)\n    error:      " << count_error      << " (" << (count_error      * 100 / count_closed)
+              << "\n    unknown:    " << count_unknown    << " (" << percent(count_unknown, count_closed)
+              << "%)\n    linestring: " << count_linestring << " (" << percent(count_linestring, count_closed)
+              << "%)\n    polygon:    " << count_polygon    << " (" << percent(count_polygon, count_closed)
+              << "%)\n    both:       " << count_both       << " (" << percent(count_both, count_closed)
+              << "%)\n    no tags:    " << count_no_tags    << " (" << percent(count_no_tags, count_closed)
+              << "%)\n    error:      " << count_error      << " (" << percent(count_error, count_closed)
               << "%)\n";
 
     std::cout << "Keys:\n";
