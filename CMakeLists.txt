@@ -6,26 +6,16 @@
 #
 #-----------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5.0)
+
+project(OsmiumDMESupport VERSION 0.0.1 LANGUAGES CXX C)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+
+#-----------------------------------------------------------------------------
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-
-#-----------------------------------------------------------------------------
-#
-#  Project version
-#
-#-----------------------------------------------------------------------------
-
-project(OsmiumDMESupport)
-
-set(ODMES_VERSION_MAJOR 0)
-set(ODMES_VERSION_MINOR 0)
-set(ODMES_VERSION_PATCH 1)
-
-set(ODMES_VERSION
-    ${ODMES_VERSION_MAJOR}.${ODMES_VERSION_MINOR}.${ODMES_VERSION_PATCH})
 
 set(AUTHOR "Jochen Topf <jochen@topf.org>")
 
@@ -36,27 +26,10 @@ set(AUTHOR "Jochen Topf <jochen@topf.org>")
 #
 #-----------------------------------------------------------------------------
 
-find_package(Osmium 2.14.2 COMPONENTS io)
-include_directories(${OSMIUM_INCLUDE_DIRS})
+find_package(Osmium 2.17.0 COMPONENTS io)
+include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS})
 
 include_directories(SYSTEM external/include)
-
-
-#-----------------------------------------------------------------------------
-#
-#  Decide which C++ version to use (Minimum/default: C++14).
-#
-#-----------------------------------------------------------------------------
-if(NOT MSVC)
-    if(NOT USE_CPP_VERSION)
-        set(USE_CPP_VERSION c++14)
-    endif()
-    message(STATUS "Use C++ version: ${USE_CPP_VERSION}")
-    # following only available from cmake 2.8.12:
-    #   add_compile_options(-std=${USE_CPP_VERSION})
-    # so using this instead:
-    add_definitions(-std=${USE_CPP_VERSION})
-endif()
 
 
 #-----------------------------------------------------------------------------
@@ -147,7 +120,7 @@ endif(CPPCHECK)
 #
 #-----------------------------------------------------------------------------
 message(STATUS "Looking for clang-tidy")
-find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-7.0 clang-tidy-6.0)
+find_program(CLANG_TIDY NAMES clang-tidy clang-tidy-14 clang-tidy-13 clang-tidy-12 clang-tidy-11)
 
 if(CLANG_TIDY)
     message(STATUS "Looking for clang-tidy - found ${CLANG_TIDY}")

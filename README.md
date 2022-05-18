@@ -12,13 +12,9 @@ For more background on this see https://github.com/osmlab/osm-data-model.
 
 ## Preqrequisites
 
-You need a C++11 compliant compiler. GCC 4.8 and later as well as clang 3.6 and
-later are known to work. It should also work on modern Visual Studio C++
-compilers.
+You need a C++17 compliant compiler. You also need the following libraries:
 
-You also need the following libraries:
-
-    Libosmium (>= 2.14.2)
+    Libosmium (>= 2.17.0)
         https://osmcode.org/libosmium
         Debian/Ubuntu: libosmium2-dev
         Fedora/CentOS: libosmium-devel
