@@ -1,6 +1,6 @@
 # duplicate-segments
 
-Create statistics on duplciated way segments.
+Create statistics on duplicated way segments.
 
 ## Run
 
