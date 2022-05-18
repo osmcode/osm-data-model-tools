@@ -4,7 +4,7 @@ OSM Data Model Tools
 
 remove-tags
 
-Copyright (C) 2018  Jochen Topf <jochen@topf.org>
+Copyright (C) 2018-2022  Jochen Topf <jochen@topf.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
