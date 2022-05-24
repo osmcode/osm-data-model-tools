@@ -180,6 +180,9 @@ void count_keys(const std::vector<std::string>& unknown_keys) {
 }
 
 static uint64_t percent(std::uint64_t fraction, std::uint64_t all) noexcept {
+    if (all == 0) {
+        return 0;
+    }
     return fraction * 100 / all;
 }
 
