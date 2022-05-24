@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
 
     while (const auto buffer = reader.read()) {
         for (const auto& way : buffer.select<osmium::Way>()) {
-            if (way.is_closed()) {
+            if (!way.nodes().empty() && way.is_closed()) {
                 ++count_closed;
                 if (way.tags().empty()) {
                     ++count_no_tags;
