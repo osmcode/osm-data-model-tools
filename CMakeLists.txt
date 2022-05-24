@@ -145,5 +145,8 @@ add_definitions(${OSMIUM_WARNING_OPTIONS})
 
 add_subdirectory(src)
 
+enable_testing()
+add_subdirectory(test)
+
 
 #-----------------------------------------------------------------------------
