@@ -1,0 +1,141 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - "ubuntu:20.04"        # gcc  9.3.0, clang 10.0.0, cmake 3.16.3
+          - "ubuntu:22.04"        # gcc 11.2.0, clang 14.0.0, cmake 3.22.1
+          - "debian:buster"       # gcc  8.3.0, clang  7.0.1, cmake 3.13.4
+          - "debian:bullseye"     # gcc 10.2.1, clang 11.0.1, cmake 3.18.4
+          - "debian:testing"      # gcc 10.3.0, clang 11.1.0, cmake 3.21.3
+          - "debian:experimental" # gcc 11.0.0, clang 14.0.0, cmake 3.21.3
+          - "fedora:34"           # gcc 11.2.1, clang 12.0.1, cmake 3.20.5
+          - "fedora:35"           # gcc 11.2.1, clang 13.0.0, cmake 3.22.0
+        build_type: [Dev]
+        cpp_compiler: [g++]
+        include:
+          - image: "debian:bullseye"
+          - image: "debian:bullseye"
+          - image: "debian:bullseye"
+            c_compiler: clang
+            cpp_compiler: clang++
+          - image: "debian:bullseye"
+            c_compiler: clang
+            cpp_compiler: clang++
+          - image: "debian:bullseye"
+            build_type: RelWithDebInfo
+          - image: "debian:bullseye"
+            c_compiler: clang
+            cpp_compiler: clang++
+          - image: "debian:testing"
+            CXXFLAGS: -Wno-stringop-overread
+          - image: "debian:testing"
+            c_compiler: clang
+            cpp_compiler: clang++
+          - image: "debian:experimental"
+            CXXFLAGS: -Wno-stringop-overread
+          - image: "debian:experimental"
+            c_compiler: clang-14
+            cpp_compiler: clang++-14
+          - image: "fedora:34"
+            CXXFLAGS: -Wno-stringop-overread
+          - image: "fedora:35"
+            CXXFLAGS: -Wno-stringop-overread
+    container:
+      image: ${{ matrix.image }}
+      env:
+        BUILD_TYPE: ${{ matrix.build_type }}
+        CC: ${{ matrix.c_compiler }}
+        CXX: ${{ matrix.cpp_compiler }}
+        CXXFLAGS: ${{ matrix.CXXFLAGS }}
+        LDFLAGS: ${{ matrix.LDFLAGS }}
+        APT_LISTCHANGES_FRONTEND: none
+        DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Prepare container (apt)
+        shell: bash
+        if: startsWith(matrix.image, 'debian:') || startsWith(matrix.image, 'ubuntu:')
+        run: |
+          apt-get update -qq
+          apt-get install -y \
+            clang \
+            cmake \
+            g++ \
+            git \
+            libbz2-dev \
+            libexpat1-dev \
+            liblz4-dev \
+            make \
+            zlib1g-dev
+      - name: Install compiler
+        shell: bash
+        if: matrix.cpp_compiler == 'clang++-14'
+        run: apt-get install -y --no-install-suggests --no-install-recommends clang-14
+      - name: Prepare container (dnf)
+        shell: bash
+        if: startsWith(matrix.image, 'fedora:')
+        run: |
+          dnf install --quiet --assumeyes \
+            bzip2-devel \
+            cmake \
+            expat-devel \
+            gcc-c++ \
+            git \
+            lz4-devel \
+            make \
+            zlib-devel
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/install-from-git
+      - uses: ./.github/actions/cmake
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  ubuntu-latest:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang-13
+      CXX: clang++-13
+      BUILD_TYPE: Dev
+    steps:
+      - name: Install new clang
+        run: |
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main'
+        shell: bash
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/install-ubuntu
+      - uses: ./.github/actions/install-from-git
+      - uses: ./.github/actions/cmake
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - "macos-10.15"
+          - "macos-11.0"
+        build_type: [Dev]
+        include:
+          - os: "macos-11.0"
+            build_type: Release
+    runs-on: ${{ matrix.os }}
+    env:
+      CC: clang
+      CXX: clang++
+      BUILD_TYPE: ${{ matrix.build_type }}
+    steps:
+      - run: brew install boost
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/install-from-git
+      - uses: ./.github/actions/cmake
+      - uses: ./.github/actions/build
+      - uses: ./.github/actions/ctest
+
