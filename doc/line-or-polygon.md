@@ -1,9 +1,8 @@
 # line-or-polygon
 
-This program looks at all the ways that are in an OSM file and tries to
-classify them as linear objects or area objects depending on the tags the
-way has. This is surprisingly complicated and there are several corner
-cases.
+This program looks at all the ways in an OSM file and tries to classify the
+closed ways as linear objects or area objects depending on the tags. This is
+surprisingly complicated and there are several corner cases.
 
 ## Run
 
