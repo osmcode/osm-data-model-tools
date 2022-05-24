@@ -87,6 +87,11 @@ classify them as linear objects or area objects depending on the tags the
 way has. This is surprisingly complicated and there are several corner
 cases.
 
+### `mark-topo-nodes`
+
+Add tags to all nodes that don't have any tags and are in multiple ways or
+members of relations.
+
 ### `remove-tags`
 
 Remove tags matching a list of patterns from the data.

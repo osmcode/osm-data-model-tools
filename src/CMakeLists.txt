@@ -14,6 +14,10 @@ add_executable(line-or-polygon line-or-polygon.cpp filter.cpp)
 target_link_libraries(line-or-polygon ${OSMIUM_IO_LIBRARIES})
 install(TARGETS line-or-polygon DESTINATION bin)
 
+add_executable(mark-topo-nodes mark-topo-nodes.cpp)
+target_link_libraries(mark-topo-nodes ${OSMIUM_IO_LIBRARIES})
+install(TARGETS mark-topo-nodes DESTINATION bin)
+
 add_executable(remove-tags remove-tags.cpp filter.cpp)
 target_link_libraries(remove-tags ${OSMIUM_IO_LIBRARIES})
 install(TARGETS remove-tags DESTINATION bin)
