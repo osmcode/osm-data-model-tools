@@ -355,7 +355,9 @@ int main(int argc, char *argv[])
         std::vector<si> common_keys;
         std::copy_if(keys.cbegin(), keys.cend(),
                      std::back_inserter(common_keys),
-                     [](auto const &p) { return p.second >= min_key_count; });
+                     [&min_key_count](auto const &p) {
+                         return p.second >= min_key_count;
+                     });
 
         std::sort(common_keys.begin(), common_keys.end(),
                   [](si const &a, si const &b) { return a.second > b.second; });
