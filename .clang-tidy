@@ -1,5 +1,5 @@
 ---
-Checks: '*,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-static-cast-downcast,-fuchsia-*,-hicpp-no-array-decay,-llvmlibc-*,-modernize-use-trailing-return-type,-readability-implicit-bool-cast,-readability-implicit-bool-conversion'
+Checks: '*,-cert-err58-cpp,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-static-cast-downcast,-fuchsia-*,-hicpp-no-array-decay,-llvmlibc-*,-modernize-use-trailing-return-type,-readability-implicit-bool-cast,-readability-implicit-bool-conversion,-readability-magic-numbers'
 #
 #  For a list of check options, see:
 #  https://clang.llvm.org/extra/clang-tidy/checks/list.html
@@ -8,6 +8,9 @@ Checks: '*,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 #
 #  cert-err58-cpp
 #    Very theoretical problem.
+#
+#  cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers
+#    Sometimes needed.
 #
 #  cppcoreguidelines-pro-bounds-array-to-pointer-decay
 #    Limited use and many false positives including for all asserts.

@@ -105,7 +105,8 @@ int main(int argc, char *argv[])
     }
     reader1.close();
 
-    osmium::memory::Buffer outbuffer{1024};
+    constexpr std::size_t const initial_buffer_size = 1024;
+    osmium::memory::Buffer outbuffer{initial_buffer_size};
     osmium::io::Writer writer{output_directory +
                               "/with-marked-topo-nodes.osm.pbf"};
 

@@ -164,6 +164,7 @@ int main(int argc, char *argv[])
     std::ofstream ids{output_directory + "/ids"};
     counter counts;
 
+    constexpr std::size_t const min_count_for_output = 10;
     for (auto it = segments.begin(); it != segments.end();) {
         auto const a = std::adjacent_find(it, segments.end());
         if (a == segments.end()) {
@@ -180,7 +181,7 @@ int main(int argc, char *argv[])
         }
         counts.increment(count - 1);
 
-        if (count > 10) {
+        if (count >= min_count_for_output) {
             ids << count << ' ' << it->first << ' ' << it->second << '\n';
         }
 

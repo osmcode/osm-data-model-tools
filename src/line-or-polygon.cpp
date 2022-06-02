@@ -342,10 +342,13 @@ int main(int argc, char *argv[])
 
     std::cout << "Keys:\n";
 
+    // Only output keys found more often than this
+    constexpr std::size_t const min_key_count = 10000;
+
     using si = std::pair<std::string, uint64_t>;
     std::vector<si> common_keys;
     for (auto const &p : keys) {
-        if (p.second > 10000) {
+        if (p.second >= min_key_count) {
             common_keys.emplace_back(p);
         }
     }
