@@ -6,6 +6,10 @@
 #
 #-----------------------------------------------------------------------------
 
+add_executable(odmt-characters characters.cpp)
+target_link_libraries(odmt-characters ${OSMIUM_IO_LIBRARIES})
+install(TARGETS odmt-characters DESTINATION bin)
+
 add_executable(odmt-duplicate-segments duplicate-segments.cpp)
 target_link_libraries(odmt-duplicate-segments ${OSMIUM_IO_LIBRARIES})
 install(TARGETS odmt-duplicate-segments DESTINATION bin)

@@ -76,6 +76,10 @@ See the [doc](doc/) directory for more documentation.
 
 ## Programs
 
+### `characters`
+
+Check characters used in tag keys and member roles. 
+
 ### `duplicate-segments`
 
 Create statistics on duplicated way segments.
