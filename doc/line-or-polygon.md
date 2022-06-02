@@ -6,7 +6,7 @@ surprisingly complicated and there are several corner cases.
 
 ## Run
 
-`line-or-polygon [OPTIONS] INPUT-FILE`
+`odmt-line-or-polygon [OPTIONS] INPUT-FILE`
 
 OPTIONS are:
 

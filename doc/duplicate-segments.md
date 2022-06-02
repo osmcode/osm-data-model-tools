@@ -4,7 +4,7 @@ Create statistics on duplicated way segments.
 
 ## Run
 
-`duplicate-segments INPUT-FILE`
+`odmt-duplicate-segments INPUT-FILE`
 
 Prints some statistics on stdout.
 

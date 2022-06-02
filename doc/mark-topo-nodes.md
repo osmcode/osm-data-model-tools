@@ -8,6 +8,6 @@ members of relations.
 
 ## Run
 
-`mark-topo-nodes -o OUTDIR INPUT-FILE`
+`odmt-mark-topo-nodes -o OUTDIR INPUT-FILE`
 
 

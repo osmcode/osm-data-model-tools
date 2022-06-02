@@ -4,7 +4,7 @@ Removes all tags matching some expressions from an OSM file.
 
 ## Run
 
-`remove-tags [OPTIONS] INPUT-FILE`
+`odmt-remove-tags [OPTIONS] INPUT-FILE`
 
 OPTIONS are:
 

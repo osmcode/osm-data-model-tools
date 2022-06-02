@@ -4,7 +4,7 @@ Create key or tag frequency statistics.
 
 ## Run
 
-`tag-stats [OPTIONS] INPUT-FILE`
+`odmt-tag-stats [OPTIONS] INPUT-FILE`
 
 OPTIONS are:
 

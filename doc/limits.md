@@ -6,5 +6,5 @@ unsually long keys, values, roles, or unusually many tags.
 
 ## Run
 
-`limits -o OUTPUT-DIR INPUT-FILE`
+`odmt-limits -o OUTPUT-DIR INPUT-FILE`
 
