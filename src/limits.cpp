@@ -29,6 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstdlib>
 #include <cstring>
+#include <exception>
 #include <fstream>
 #include <string>
 #include <tuple>
@@ -112,16 +113,17 @@ check_limits(osmium::OSMObject const &object)
 
 int main(int argc, char *argv[])
 {
-    std::string input_filename;
-    std::string output_directory{"."};
-    std::size_t max_key_length = 63;
-    std::size_t max_value_length = 200;
-    std::size_t max_role_length = 63;
-    std::size_t max_tags_count = 50;
-    std::size_t max_tags_bytes = 1024;
-    bool help = false;
+    try {
+        std::string input_filename;
+        std::string output_directory{"."};
+        std::size_t max_key_length = 63;
+        std::size_t max_value_length = 200;
+        std::size_t max_role_length = 63;
+        std::size_t max_tags_count = 50;
+        std::size_t max_tags_bytes = 1024;
+        bool help = false;
 
-    // clang-format off
+        // clang-format off
     auto const cli
         = lyra::opt(output_directory, "DIR")
             ["-o"]["--output-dir"]
@@ -144,91 +146,99 @@ int main(int argc, char *argv[])
         | lyra::help(help)
         | lyra::arg(input_filename, "FILENAME")
             ("input file");
-    // clang-format on
+        // clang-format on
 
-    auto const result = cli.parse(lyra::args(argc, argv));
-    if (!result) {
-        std::cerr << "Error in command line: " << result.message() << '\n';
-        return 1;
-    }
+        auto const result = cli.parse(lyra::args(argc, argv));
+        if (!result) {
+            std::cerr << "Error in command line: " << result.message() << '\n';
+            return 1;
+        }
 
-    if (help) {
-        std::cout << cli
-                  << "\nExtract objects with unusual number of 'things'.\n";
-        return 0;
-    }
+        if (help) {
+            std::cout << cli
+                      << "\nExtract objects with unusual number of 'things'.\n";
+            return 0;
+        }
 
-    if (input_filename.empty()) {
-        std::cerr << "Missing input filename. Try '-h'.\n";
-        return 1;
-    }
+        if (input_filename.empty()) {
+            std::cerr << "Missing input filename. Try '-h'.\n";
+            return 1;
+        }
 
-    std::vector<std::size_t> hist_tags_count;
-    std::vector<std::size_t> hist_tags_bytes;
+        std::vector<std::size_t> hist_tags_count;
+        std::vector<std::size_t> hist_tags_bytes;
 
-    osmium::io::File input_file{input_filename};
+        osmium::io::File input_file{input_filename};
 
-    osmium::VerboseOutput vout{true};
+        osmium::VerboseOutput vout{true};
 
-    osmium::io::Reader reader{input_file};
-    osmium::io::Writer writer_key_length{
-        output_directory + "/key-length.osm.pbf", osmium::io::overwrite::allow};
-    osmium::io::Writer writer_value_length{output_directory +
-                                               "/value-length.osm.pbf",
-                                           osmium::io::overwrite::allow};
-    osmium::io::Writer writer_role_length{output_directory +
-                                              "/role-length.osm.pbf",
-                                          osmium::io::overwrite::allow};
-    osmium::io::Writer writer_empty{output_directory +
-                                        "/empty-key-or-value.osm.pbf",
-                                    osmium::io::overwrite::allow};
-    osmium::io::Writer writer_tags_count{
-        output_directory + "/tags-count.osm.pbf", osmium::io::overwrite::allow};
-    osmium::io::Writer writer_tags_bytes{
-        output_directory + "/tags-bytes.osm.pbf", osmium::io::overwrite::allow};
+        osmium::io::Reader reader{input_file};
+        osmium::io::Writer writer_key_length{output_directory +
+                                                 "/key-length.osm.pbf",
+                                             osmium::io::overwrite::allow};
+        osmium::io::Writer writer_value_length{output_directory +
+                                                   "/value-length.osm.pbf",
+                                               osmium::io::overwrite::allow};
+        osmium::io::Writer writer_role_length{output_directory +
+                                                  "/role-length.osm.pbf",
+                                              osmium::io::overwrite::allow};
+        osmium::io::Writer writer_empty{output_directory +
+                                            "/empty-key-or-value.osm.pbf",
+                                        osmium::io::overwrite::allow};
+        osmium::io::Writer writer_tags_count{output_directory +
+                                                 "/tags-count.osm.pbf",
+                                             osmium::io::overwrite::allow};
+        osmium::io::Writer writer_tags_bytes{output_directory +
+                                                 "/tags-bytes.osm.pbf",
+                                             osmium::io::overwrite::allow};
 
-    while (auto const buffer = reader.read()) {
-        for (auto const &object : buffer.select<osmium::OSMObject>()) {
-            increment(&hist_tags_count, object.tags().size());
-            if (object.tags().size() > max_tags_count) {
-                writer_tags_count(object);
-            }
-            auto [lk, lv, lr, tags_bytes, empty] = check_limits(object);
-            increment(&hist_tags_bytes, tags_bytes);
-            if (lk > max_key_length) {
-                writer_key_length(object);
-            }
-            if (lv > max_value_length) {
-                writer_value_length(object);
-            }
-            if (lr > max_role_length) {
-                writer_role_length(object);
-            }
-            if (tags_bytes > max_tags_bytes) {
-                writer_tags_bytes(object);
-            }
-            if (empty) {
-                writer_empty(object);
+        while (auto const buffer = reader.read()) {
+            for (auto const &object : buffer.select<osmium::OSMObject>()) {
+                increment(&hist_tags_count, object.tags().size());
+                if (object.tags().size() > max_tags_count) {
+                    writer_tags_count(object);
+                }
+                auto [lk, lv, lr, tags_bytes, empty] = check_limits(object);
+                increment(&hist_tags_bytes, tags_bytes);
+                if (lk > max_key_length) {
+                    writer_key_length(object);
+                }
+                if (lv > max_value_length) {
+                    writer_value_length(object);
+                }
+                if (lr > max_role_length) {
+                    writer_role_length(object);
+                }
+                if (tags_bytes > max_tags_bytes) {
+                    writer_tags_bytes(object);
+                }
+                if (empty) {
+                    writer_empty(object);
+                }
             }
         }
+
+        writer_tags_bytes.close();
+        writer_tags_count.close();
+        writer_empty.close();
+        writer_role_length.close();
+        writer_value_length.close();
+        writer_key_length.close();
+
+        reader.close();
+
+        output_hist(output_directory, "key-lengths", hist_keys);
+        output_hist(output_directory, "value-lengths", hist_values);
+        output_hist(output_directory, "role-lengths", hist_roles);
+        output_hist(output_directory, "tags-count", hist_tags_count);
+        output_hist(output_directory, "tags-bytes", hist_tags_bytes);
+        output_hist(output_directory, "way-nodes-count", hist_way_nodes);
+        output_hist(output_directory, "members-count", hist_members);
+
+        vout << "Done.\n";
+    } catch (std::exception const &e) {
+        std::cerr << "ERROR: " << e.what() << "\n";
+        return 1;
     }
-
-    writer_tags_bytes.close();
-    writer_tags_count.close();
-    writer_empty.close();
-    writer_role_length.close();
-    writer_value_length.close();
-    writer_key_length.close();
-
-    reader.close();
-
-    output_hist(output_directory, "key-lengths", hist_keys);
-    output_hist(output_directory, "value-lengths", hist_values);
-    output_hist(output_directory, "role-lengths", hist_roles);
-    output_hist(output_directory, "tags-count", hist_tags_count);
-    output_hist(output_directory, "tags-bytes", hist_tags_bytes);
-    output_hist(output_directory, "way-nodes-count", hist_way_nodes);
-    output_hist(output_directory, "members-count", hist_members);
-
-    vout << "Done.\n";
+    return 0;
 }

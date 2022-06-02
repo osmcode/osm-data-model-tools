@@ -31,6 +31,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <lyra.hpp>
 
+#include <exception>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -109,12 +110,13 @@ public:
 
 int main(int argc, char *argv[])
 {
-    std::string input_filename;
-    std::string output_filename;
-    std::string filter_filename;
-    bool help = false;
+    try {
+        std::string input_filename;
+        std::string output_filename;
+        std::string filter_filename;
+        bool help = false;
 
-    // clang-format off
+        // clang-format off
     auto const cli
         = lyra::opt(output_filename, "OUTPUT-FILE")
             ["-o"]["--output"]
@@ -125,53 +127,58 @@ int main(int argc, char *argv[])
         | lyra::help(help)
         | lyra::arg(input_filename, "FILENAME")
             ("input file");
-    // clang-format on
+        // clang-format on
 
-    auto const result = cli.parse(lyra::args(argc, argv));
-    if (!result) {
-        std::cerr << "Error in command line: " << result.message() << '\n';
+        auto const result = cli.parse(lyra::args(argc, argv));
+        if (!result) {
+            std::cerr << "Error in command line: " << result.message() << '\n';
+            return 1;
+        }
+
+        if (help) {
+            std::cout
+                << cli
+                << "\nRemove tags matching any expressions in filter file.\n";
+            return 0;
+        }
+
+        if (input_filename.empty()) {
+            std::cerr << "Missing input filename. Try '-h'.\n";
+            return 1;
+        }
+
+        if (output_filename.empty()) {
+            std::cerr << "Missing output filename. Try '-h'.\n";
+            return 1;
+        }
+
+        if (filter_filename.empty()) {
+            std::cerr << "Missing filter filename. Try '-h'.\n";
+            return 1;
+        }
+
+        auto const filter = load_filter_patterns(filter_filename);
+
+        osmium::io::File input_file{input_filename};
+        osmium::io::File output_file{output_filename};
+
+        osmium::io::Reader reader{input_file};
+        osmium::io::Writer writer{output_file, osmium::io::overwrite::allow};
+
+        while (auto const buffer = reader.read()) {
+            osmium::memory::Buffer output_buffer{
+                buffer.committed(), osmium::memory::Buffer::auto_grow::yes};
+            RewriteHandler handler{&output_buffer, filter};
+            osmium::apply(buffer, handler);
+            writer(std::move(output_buffer));
+        }
+
+        writer.close();
+        reader.close();
+
+    } catch (std::exception const &e) {
+        std::cerr << "ERROR: " << e.what() << "\n";
         return 1;
     }
-
-    if (help) {
-        std::cout << cli
-                  << "\nRemove tags matching any expressions in filter file.\n";
-        return 0;
-    }
-
-    if (input_filename.empty()) {
-        std::cerr << "Missing input filename. Try '-h'.\n";
-        return 1;
-    }
-
-    if (output_filename.empty()) {
-        std::cerr << "Missing output filename. Try '-h'.\n";
-        return 1;
-    }
-
-    if (filter_filename.empty()) {
-        std::cerr << "Missing filter filename. Try '-h'.\n";
-        return 1;
-    }
-
-    auto const filter = load_filter_patterns(filter_filename);
-
-    osmium::io::File input_file{input_filename};
-    osmium::io::File output_file{output_filename};
-
-    osmium::io::Reader reader{input_file};
-    osmium::io::Writer writer{output_file, osmium::io::overwrite::allow};
-
-    while (auto const buffer = reader.read()) {
-        osmium::memory::Buffer output_buffer{
-            buffer.committed(), osmium::memory::Buffer::auto_grow::yes};
-        RewriteHandler handler{&output_buffer, filter};
-        osmium::apply(buffer, handler);
-        writer(std::move(output_buffer));
-    }
-
-    writer.close();
-    reader.close();
-
     return 0;
 }
