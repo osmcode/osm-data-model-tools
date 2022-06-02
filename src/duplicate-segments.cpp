@@ -81,13 +81,13 @@ int main(int argc, char *argv[])
         bool help = false;
 
         // clang-format off
-    auto const cli
-        = lyra::opt(output_directory, "DIR")
-            ["-o"]["--output-dir"]
-            ("output directory")
-        | lyra::help(help)
-        | lyra::arg(input_filename, "FILENAME")
-            ("input file");
+        auto const cli
+            = lyra::opt(output_directory, "DIR")
+                ["-o"]["--output-dir"]
+                ("output directory")
+            | lyra::help(help)
+            | lyra::arg(input_filename, "FILENAME")
+                ("input file");
         // clang-format on
 
         auto const result = cli.parse(lyra::args(argc, argv));

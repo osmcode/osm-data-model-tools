@@ -124,28 +124,28 @@ int main(int argc, char *argv[])
         bool help = false;
 
         // clang-format off
-    auto const cli
-        = lyra::opt(output_directory, "DIR")
-            ["-o"]["--output-dir"]
-            ("output directory (default: cwd)")
-        | lyra::opt(max_key_length, "LENGTH")
-            ["-k"]["--max-key-length"]
-            ("max key length (default: 63)")
-        | lyra::opt(max_value_length, "LENGTH")
-            ["-v"]["--max-value-length"]
-            ("max value length (default: 200)")
-        | lyra::opt(max_role_length, "LENGTH")
-            ["-r"]["--max-role-length"]
-            ("max role length (default: 63)")
-        | lyra::opt(max_tags_count, "COUNT")
-            ["-t"]["--max-tags-count"]
-            ("max tags count (default: 50)")
-        | lyra::opt(max_tags_bytes, "BYTES")
-            ["-b"]["--max-tags-bytes"]
-            ("max tags bytes (default: 1024)")
-        | lyra::help(help)
-        | lyra::arg(input_filename, "FILENAME")
-            ("input file");
+        auto const cli
+            = lyra::opt(output_directory, "DIR")
+                ["-o"]["--output-dir"]
+                ("output directory (default: cwd)")
+            | lyra::opt(max_key_length, "LENGTH")
+                ["-k"]["--max-key-length"]
+                ("max key length (default: 63)")
+            | lyra::opt(max_value_length, "LENGTH")
+                ["-v"]["--max-value-length"]
+                ("max value length (default: 200)")
+            | lyra::opt(max_role_length, "LENGTH")
+                ["-r"]["--max-role-length"]
+                ("max role length (default: 63)")
+            | lyra::opt(max_tags_count, "COUNT")
+                ["-t"]["--max-tags-count"]
+                ("max tags count (default: 50)")
+            | lyra::opt(max_tags_bytes, "BYTES")
+                ["-b"]["--max-tags-bytes"]
+                ("max tags bytes (default: 1024)")
+            | lyra::help(help)
+            | lyra::arg(input_filename, "FILENAME")
+                ("input file");
         // clang-format on
 
         auto const result = cli.parse(lyra::args(argc, argv));

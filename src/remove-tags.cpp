@@ -117,16 +117,16 @@ int main(int argc, char *argv[])
         bool help = false;
 
         // clang-format off
-    auto const cli
-        = lyra::opt(output_filename, "OUTPUT-FILE")
-            ["-o"]["--output"]
-            ("output file")
-        | lyra::opt(filter_filename, "FILTER-FILE")
-            ["-e"]["--expressions"]
-            ("filter expressions file")
-        | lyra::help(help)
-        | lyra::arg(input_filename, "FILENAME")
-            ("input file");
+        auto const cli
+            = lyra::opt(output_filename, "OUTPUT-FILE")
+                ["-o"]["--output"]
+                ("output file")
+            | lyra::opt(filter_filename, "FILTER-FILE")
+                ["-e"]["--expressions"]
+                ("filter expressions file")
+            | lyra::help(help)
+            | lyra::arg(input_filename, "FILENAME")
+                ("input file");
         // clang-format on
 
         auto const result = cli.parse(lyra::args(argc, argv));
