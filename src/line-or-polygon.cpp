@@ -347,11 +347,8 @@ int main(int argc, char *argv[])
 
     using si = std::pair<std::string, uint64_t>;
     std::vector<si> common_keys;
-    for (auto const &p : keys) {
-        if (p.second >= min_key_count) {
-            common_keys.emplace_back(p);
-        }
-    }
+    std::copy_if(keys.cbegin(), keys.cend(), std::back_inserter(common_keys),
+                 [](auto const &p) { return p.second >= min_key_count; });
 
     std::sort(common_keys.begin(), common_keys.end(),
               [](si const &a, si const &b) { return a.second > b.second; });

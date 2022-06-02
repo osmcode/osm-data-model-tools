@@ -94,11 +94,8 @@ int main(int argc, char *argv[])
 
     using si = std::pair<std::string, std::size_t>;
     std::vector<si> common_keys;
-    for (auto const &p : dict) {
-        if (p.second >= min_count) {
-            common_keys.emplace_back(p);
-        }
-    }
+    std::copy_if(dict.cbegin(), dict.cend(), std::back_inserter(common_keys),
+                 [&min_count](auto const &p) { return p.second >= min_count; });
 
     std::sort(common_keys.begin(), common_keys.end(),
               [](si const &a, si const &b) { return a.second > b.second; });
