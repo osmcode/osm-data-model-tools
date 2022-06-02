@@ -63,9 +63,12 @@ public:
 
     using const_iterator = std::vector<std::size_t>::const_iterator;
 
-    const_iterator begin() const noexcept { return m_counts.begin(); }
+    [[nodiscard]] const_iterator begin() const noexcept
+    {
+        return m_counts.begin();
+    }
 
-    const_iterator end() const noexcept { return m_counts.end(); }
+    [[nodiscard]] const_iterator end() const noexcept { return m_counts.end(); }
 
 }; // class counter
 
