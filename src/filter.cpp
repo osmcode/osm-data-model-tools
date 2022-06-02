@@ -7,20 +7,22 @@
 #include <stdexcept>
 #include <string>
 
-static void strip_whitespace(std::string* string) {
+static void strip_whitespace(std::string *string)
+{
     assert(string);
 
     while (!string->empty() && string->back() == ' ') {
         string->pop_back();
     }
 
-    const auto pos = string->find_first_not_of(' ');
+    auto const pos = string->find_first_not_of(' ');
     if (pos != std::string::npos) {
         string->erase(0, pos);
     }
 }
 
-static osmium::StringMatcher get_string_matcher(std::string string) {
+static osmium::StringMatcher get_string_matcher(std::string string)
+{
     strip_whitespace(&string);
 
     if (string.size() == 1 && string.front() == '*') {
@@ -32,7 +34,7 @@ static osmium::StringMatcher get_string_matcher(std::string string) {
             return osmium::StringMatcher::equal{string};
         }
         auto sstrings = osmium::split_string(string, ',');
-        for (auto& s : sstrings) {
+        for (auto &s : sstrings) {
             strip_whitespace(&s);
         }
         return osmium::StringMatcher::list{sstrings};
@@ -56,14 +58,15 @@ static osmium::StringMatcher get_string_matcher(std::string string) {
     return osmium::StringMatcher::substring{s};
 }
 
-static osmium::TagMatcher get_tag_matcher(const std::string& expression) {
-    const auto op_pos = expression.find('=');
+static osmium::TagMatcher get_tag_matcher(std::string const &expression)
+{
+    auto const op_pos = expression.find('=');
     if (op_pos == std::string::npos) {
         return osmium::TagMatcher{get_string_matcher(expression)};
     }
 
     auto key = expression.substr(0, op_pos);
-    const auto value = expression.substr(op_pos + 1);
+    auto const value = expression.substr(op_pos + 1);
 
     bool invert = false;
     if (!key.empty() && key.back() == '!') {
@@ -71,10 +74,12 @@ static osmium::TagMatcher get_tag_matcher(const std::string& expression) {
         invert = true;
     }
 
-    return osmium::TagMatcher{get_string_matcher(key), get_string_matcher(value), invert};
+    return osmium::TagMatcher{get_string_matcher(key),
+                              get_string_matcher(value), invert};
 }
 
-osmium::TagsFilter load_filter_patterns(const std::string& file_name) {
+osmium::TagsFilter load_filter_patterns(std::string const &file_name)
+{
     std::ifstream file{file_name};
     if (!file.is_open()) {
         throw std::runtime_error{"Could not open file '" + file_name + "'"};
@@ -83,7 +88,7 @@ osmium::TagsFilter load_filter_patterns(const std::string& file_name) {
     osmium::TagsFilter filter{false};
 
     for (std::string line; std::getline(file, line);) {
-        const auto pos = line.find_first_of('#');
+        auto const pos = line.find_first_of('#');
         if (pos != std::string::npos) {
             line.erase(pos);
         }
@@ -97,4 +102,3 @@ osmium::TagsFilter load_filter_patterns(const std::string& file_name) {
 
     return filter;
 }
-

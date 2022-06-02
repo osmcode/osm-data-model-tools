@@ -21,10 +21,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
+#include <osmium/builder/osm_object_builder.hpp>
 #include <osmium/index/id_set.hpp>
 #include <osmium/io/any_input.hpp>
 #include <osmium/io/any_output.hpp>
-#include <osmium/builder/osm_object_builder.hpp>
 
 #include <lyra.hpp>
 
@@ -33,20 +33,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <memory>
 #include <string>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     std::string input_filename;
     std::string output_directory;
     bool help = false;
 
-    const auto cli
+    // clang-format off
+    auto const cli
         = lyra::opt(output_directory, "DIR")
             ["-o"]["--output-dir"]
             ("output directory")
         | lyra::help(help)
         | lyra::arg(input_filename, "FILENAME")
             ("input file");
+    // clang-format on
 
-    const auto result = cli.parse(lyra::args(argc, argv));
+    auto const result = cli.parse(lyra::args(argc, argv));
     if (!result) {
         std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
@@ -69,15 +72,17 @@ int main(int argc, char* argv[]) {
 
     osmium::io::File input_file{input_filename};
 
-    osmium::io::Reader reader1{input_file, osmium::osm_entity_bits::way | osmium::osm_entity_bits::relation};
-    while (const auto buffer = reader1.read()) {
-        for (const auto& object : buffer.select<osmium::OSMObject>()) {
+    osmium::io::Reader reader1{input_file,
+                               osmium::osm_entity_bits::way |
+                                   osmium::osm_entity_bits::relation};
+    while (auto const buffer = reader1.read()) {
+        for (auto const &object : buffer.select<osmium::OSMObject>()) {
             if (object.type() == osmium::item_type::way) {
-                const auto& way = static_cast<const osmium::Way&>(object);
+                auto const &way = static_cast<osmium::Way const &>(object);
                 if (way.nodes().empty()) {
                     continue;
                 }
-                const auto *it = way.nodes().begin();
+                auto const *it = way.nodes().begin();
                 if (way.is_closed()) {
                     ++it;
                 }
@@ -89,7 +94,8 @@ int main(int argc, char* argv[]) {
                     }
                 }
             } else {
-                for (const auto& member : static_cast<const osmium::Relation&>(object).members()) {
+                for (auto const &member :
+                     static_cast<osmium::Relation const &>(object).members()) {
                     if (member.type() == osmium::item_type::node) {
                         in_relation.set(member.positive_ref());
                     }
@@ -100,20 +106,23 @@ int main(int argc, char* argv[]) {
     reader1.close();
 
     osmium::memory::Buffer outbuffer{1024};
-    osmium::io::Writer writer{output_directory + "/with-marked-topo-nodes.osm.pbf"};
+    osmium::io::Writer writer{output_directory +
+                              "/with-marked-topo-nodes.osm.pbf"};
 
     osmium::io::Reader reader2{input_file};
-    while (const auto buffer = reader2.read()) {
-        for (const auto& object : buffer.select<osmium::OSMObject>()) {
+    while (auto const buffer = reader2.read()) {
+        for (auto const &object : buffer.select<osmium::OSMObject>()) {
             if (object.type() == osmium::item_type::node) {
-                const bool in_mw = in_multiple_ways.get(object.positive_id());
-                const bool in_rel = in_relation.get(object.positive_id());
+                bool const in_mw = in_multiple_ways.get(object.positive_id());
+                bool const in_rel = in_relation.get(object.positive_id());
                 if (!object.tags().empty() || (!in_mw && !in_rel)) {
                     writer(object);
                 } else {
                     {
                         osmium::builder::NodeBuilder builder{outbuffer};
-                        builder.set_location(static_cast<const osmium::Node &>(object).location());
+                        builder.set_location(
+                            static_cast<osmium::Node const &>(object)
+                                .location());
                         builder.set_id(object.id());
                         builder.set_version(object.version());
                         builder.set_timestamp(object.timestamp());
@@ -139,4 +148,3 @@ int main(int argc, char* argv[]) {
     writer.close();
     reader2.close();
 }
-

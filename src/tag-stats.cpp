@@ -32,14 +32,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <unordered_map>
 #include <vector>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     std::string input_filename;
     std::size_t max_tags = 10000; // essentially all
     std::size_t min_count = 100;
     bool with_values = false;
     bool help = false;
 
-    const auto cli
+    // clang-format off
+    auto const cli
         = lyra::opt(max_tags, "N")
             ["-m"]["--max-tags"]
             ("count tags only on objects with no more than this many tags (default: all)")
@@ -52,16 +54,16 @@ int main(int argc, char* argv[]) {
         | lyra::help(help)
         | lyra::arg(input_filename, "FILENAME")
             ("input file");
+    // clang-format on
 
-    const auto result = cli.parse(lyra::args(argc, argv));
+    auto const result = cli.parse(lyra::args(argc, argv));
     if (!result) {
         std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
     }
 
     if (help) {
-        std::cout << cli
-                  << "\nCreate tag statistics.\n";
+        std::cout << cli << "\nCreate tag statistics.\n";
         return 0;
     }
 
@@ -75,10 +77,10 @@ int main(int argc, char* argv[]) {
     std::unordered_map<std::string, std::size_t> dict;
 
     osmium::io::Reader reader{input_file};
-    while (const auto buffer = reader.read()) {
-        for (const auto& object : buffer.select<osmium::OSMObject>()) {
+    while (auto const buffer = reader.read()) {
+        for (auto const &object : buffer.select<osmium::OSMObject>()) {
             if (object.tags().size() <= max_tags) {
-                for (const auto& tag : object.tags()) {
+                for (auto const &tag : object.tags()) {
                     if (with_values) {
                         dict[tag.key() + std::string{"="} + tag.value()]++;
                     } else {
@@ -92,18 +94,16 @@ int main(int argc, char* argv[]) {
 
     using si = std::pair<std::string, std::size_t>;
     std::vector<si> common_keys;
-    for (const auto& p : dict) {
+    for (auto const &p : dict) {
         if (p.second >= min_count) {
             common_keys.emplace_back(p);
         }
     }
 
-    std::sort(common_keys.begin(), common_keys.end(), [](const si& a, const si& b) {
-        return a.second > b.second;
-    });
+    std::sort(common_keys.begin(), common_keys.end(),
+              [](si const &a, si const &b) { return a.second > b.second; });
 
-    for (const auto& p : common_keys) {
+    for (auto const &p : common_keys) {
         std::cout << p.second << ' ' << p.first << '\n';
     }
 }
-

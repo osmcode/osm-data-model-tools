@@ -35,13 +35,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <string>
 #include <utility>
 
-class RewriteHandler : public osmium::handler::Handler {
+class RewriteHandler : public osmium::handler::Handler
+{
 
-    osmium::memory::Buffer* m_buffer;
-    const osmium::TagsFilter& m_filter;
+    osmium::memory::Buffer *m_buffer;
+    osmium::TagsFilter const &m_filter;
 
     template <typename T>
-    void copy_attributes(T& builder, const osmium::OSMObject& object) {
+    void copy_attributes(T &builder, osmium::OSMObject const &object)
+    {
         builder.set_id(object.id())
             .set_version(object.version())
             .set_changeset(object.changeset())
@@ -50,10 +52,12 @@ class RewriteHandler : public osmium::handler::Handler {
             .set_user(object.user());
     }
 
-    void copy_tags(osmium::builder::Builder* parent, const osmium::TagList& tags) {
+    void copy_tags(osmium::builder::Builder *parent,
+                   osmium::TagList const &tags)
+    {
         osmium::builder::TagListBuilder builder{*parent};
 
-        for (const auto& tag : tags) {
+        for (auto const &tag : tags) {
             if (!m_filter(tag)) {
                 builder.add_tag(tag);
             }
@@ -61,14 +65,15 @@ class RewriteHandler : public osmium::handler::Handler {
     }
 
 public:
-
-    explicit RewriteHandler(osmium::memory::Buffer* buffer, const osmium::TagsFilter& filter) :
-        m_buffer(buffer),
-        m_filter(filter) {
+    explicit RewriteHandler(osmium::memory::Buffer *buffer,
+                            osmium::TagsFilter const &filter)
+    : m_buffer(buffer), m_filter(filter)
+    {
         assert(buffer);
     }
 
-    void node(const osmium::Node& node) {
+    void node(osmium::Node const &node)
+    {
         {
             osmium::builder::NodeBuilder builder{*m_buffer};
             copy_attributes(builder, node);
@@ -78,7 +83,8 @@ public:
         m_buffer->commit();
     }
 
-    void way(const osmium::Way& way) {
+    void way(osmium::Way const &way)
+    {
         {
             osmium::builder::WayBuilder builder{*m_buffer};
             copy_attributes(builder, way);
@@ -88,7 +94,8 @@ public:
         m_buffer->commit();
     }
 
-    void relation(const osmium::Relation& relation) {
+    void relation(osmium::Relation const &relation)
+    {
         {
             osmium::builder::RelationBuilder builder{*m_buffer};
             copy_attributes(builder, relation);
@@ -100,13 +107,15 @@ public:
 
 }; // class RewriteHandler
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     std::string input_filename;
     std::string output_filename;
     std::string filter_filename;
     bool help = false;
 
-    const auto cli
+    // clang-format off
+    auto const cli
         = lyra::opt(output_filename, "OUTPUT-FILE")
             ["-o"]["--output"]
             ("output file")
@@ -116,8 +125,9 @@ int main(int argc, char* argv[]) {
         | lyra::help(help)
         | lyra::arg(input_filename, "FILENAME")
             ("input file");
+    // clang-format on
 
-    const auto result = cli.parse(lyra::args(argc, argv));
+    auto const result = cli.parse(lyra::args(argc, argv));
     if (!result) {
         std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
@@ -144,7 +154,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    const auto filter = load_filter_patterns(filter_filename);
+    auto const filter = load_filter_patterns(filter_filename);
 
     osmium::io::File input_file{input_filename};
     osmium::io::File output_file{output_filename};
@@ -152,8 +162,9 @@ int main(int argc, char* argv[]) {
     osmium::io::Reader reader{input_file};
     osmium::io::Writer writer{output_file, osmium::io::overwrite::allow};
 
-    while (const auto buffer = reader.read()) {
-        osmium::memory::Buffer output_buffer{buffer.committed(), osmium::memory::Buffer::auto_grow::yes};
+    while (auto const buffer = reader.read()) {
+        osmium::memory::Buffer output_buffer{
+            buffer.committed(), osmium::memory::Buffer::auto_grow::yes};
         RewriteHandler handler{&output_buffer, filter};
         osmium::apply(buffer, handler);
         writer(std::move(output_buffer));
@@ -164,4 +175,3 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-

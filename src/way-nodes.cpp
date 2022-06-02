@@ -32,33 +32,37 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <memory>
 #include <string>
 
-static std::string percent(std::uint64_t fraction, std::uint64_t all, const char* text) noexcept {
-    const auto p = fraction * 100 / all;
+static std::string percent(std::uint64_t fraction, std::uint64_t all,
+                           char const* text) noexcept
+{
+    auto const p = fraction * 100 / all;
     return " (" + std::to_string(p) + "% of " + text + ")";
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     std::string input_filename;
     std::string output_directory;
     bool help = false;
 
-    const auto cli
+    // clang-format off
+    auto const cli
         = lyra::opt(output_directory, "DIR")
             ["-o"]["--output-dir"]
             ("output directory")
         | lyra::help(help)
         | lyra::arg(input_filename, "FILENAME")
             ("input file");
+    // clang-format on
 
-    const auto result = cli.parse(lyra::args(argc, argv));
+    auto const result = cli.parse(lyra::args(argc, argv));
     if (!result) {
         std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
     }
 
     if (help) {
-        std::cout << cli
-                  << "\nCreate statistics on way nodes.\n";
+        std::cout << cli << "\nCreate statistics on way nodes.\n";
         return 0;
     }
 
@@ -76,16 +80,18 @@ int main(int argc, char* argv[]) {
     std::uint64_t count_ways = 0;
     std::uint64_t count_relations = 0;
 
-    osmium::io::Reader reader1{input_file, osmium::osm_entity_bits::way | osmium::osm_entity_bits::relation};
-    while (const auto buffer = reader1.read()) {
-        for (const auto& object : buffer.select<osmium::OSMObject>()) {
+    osmium::io::Reader reader1{input_file,
+                               osmium::osm_entity_bits::way |
+                                   osmium::osm_entity_bits::relation};
+    while (auto const buffer = reader1.read()) {
+        for (auto const &object : buffer.select<osmium::OSMObject>()) {
             if (object.type() == osmium::item_type::way) {
                 ++count_ways;
-                const auto& way = static_cast<const osmium::Way&>(object);
+                auto const &way = static_cast<osmium::Way const &>(object);
                 if (way.nodes().empty()) {
                     continue;
                 }
-                const auto *it = way.nodes().begin();
+                auto const *it = way.nodes().begin();
                 if (way.is_closed()) {
                     ++it;
                 }
@@ -98,7 +104,8 @@ int main(int argc, char* argv[]) {
                 }
             } else {
                 ++count_relations;
-                for (const auto& member : static_cast<const osmium::Relation&>(object).members()) {
+                for (auto const &member :
+                     static_cast<osmium::Relation const &>(object).members()) {
                     if (member.type() == osmium::item_type::node) {
                         in_relation.set(member.positive_ref());
                     }
@@ -117,12 +124,13 @@ int main(int argc, char* argv[]) {
 
     std::unique_ptr<osmium::io::Writer> writer_nodes_with_tags_in_way;
     if (!output_directory.empty()) {
-        writer_nodes_with_tags_in_way = std::make_unique<osmium::io::Writer>(output_directory + "/nodes_with_tags_in_way.osm.pbf");
+        writer_nodes_with_tags_in_way = std::make_unique<osmium::io::Writer>(
+            output_directory + "/nodes_with_tags_in_way.osm.pbf");
     }
 
     osmium::io::Reader reader2{input_file, osmium::osm_entity_bits::node};
-    while (const auto buffer = reader2.read()) {
-        for (const auto& node : buffer.select<osmium::Node>()) {
+    while (auto const buffer = reader2.read()) {
+        for (auto const &node : buffer.select<osmium::Node>()) {
             ++count_nodes;
             if (!node.tags().empty()) {
                 ++count_nodes_with_tags;
@@ -150,14 +158,19 @@ int main(int argc, char* argv[]) {
     }
     reader2.close();
 
-    std::cout << "nodes: " << count_nodes
-              << "\nways: " << count_ways
+    std::cout << "nodes: " << count_nodes << "\nways: " << count_ways
               << "\nrelations: " << count_relations
-              << "\nnodes with tags: " << count_nodes_with_tags << percent(count_nodes_with_tags, count_nodes, "all nodes")
-              << "\nnodes in way: " << count_nodes_in_way << percent(count_nodes_in_way, count_nodes, "all nodes")
-              << "\nnodes with tags in way: " << count_nodes_with_tags_in_way << percent(count_nodes_with_tags_in_way, count_nodes, "all nodes") << percent(count_nodes_with_tags_in_way, count_nodes_with_tags, "tagged nodes")
-              << "\nnodes in multiple ways: " << count_nodes_in_multiple_ways << percent(count_nodes_in_multiple_ways, count_nodes, "all nodes")
-              << "\nnodes in relation: " << count_nodes_in_relation << percent(count_nodes_in_relation, count_nodes, "all nodes")
+              << "\nnodes with tags: " << count_nodes_with_tags
+              << percent(count_nodes_with_tags, count_nodes, "all nodes")
+              << "\nnodes in way: " << count_nodes_in_way
+              << percent(count_nodes_in_way, count_nodes, "all nodes")
+              << "\nnodes with tags in way: " << count_nodes_with_tags_in_way
+              << percent(count_nodes_with_tags_in_way, count_nodes, "all nodes")
+              << percent(count_nodes_with_tags_in_way, count_nodes_with_tags,
+                         "tagged nodes")
+              << "\nnodes in multiple ways: " << count_nodes_in_multiple_ways
+              << percent(count_nodes_in_multiple_ways, count_nodes, "all nodes")
+              << "\nnodes in relation: " << count_nodes_in_relation
+              << percent(count_nodes_in_relation, count_nodes, "all nodes")
               << '\n';
 }
-

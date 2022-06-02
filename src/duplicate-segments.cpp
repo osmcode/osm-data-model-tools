@@ -37,21 +37,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <utility>
 #include <vector>
 
-struct node_pair : public std::pair<osmium::object_id_type, osmium::object_id_type> {
+struct node_pair
+: public std::pair<osmium::object_id_type, osmium::object_id_type>
+{
 
-    node_pair(osmium::object_id_type a, osmium::object_id_type b) :
-        pair(std::min(a, b), std::max(a, b)) {
-    }
+    node_pair(osmium::object_id_type a, osmium::object_id_type b)
+    : pair(std::min(a, b), std::max(a, b))
+    {}
 
 }; // struct node_pair
 
-class counter {
+class counter
+{
 
     std::vector<std::size_t> m_counts;
 
 public:
-
-    void increment(std::size_t value) {
+    void increment(std::size_t value)
+    {
         if (value >= m_counts.size()) {
             m_counts.resize(value + 1);
         }
@@ -60,38 +63,36 @@ public:
 
     using const_iterator = std::vector<std::size_t>::const_iterator;
 
-    const_iterator begin() const noexcept {
-        return m_counts.begin();
-    }
+    const_iterator begin() const noexcept { return m_counts.begin(); }
 
-    const_iterator end() const noexcept {
-        return m_counts.end();
-    }
+    const_iterator end() const noexcept { return m_counts.end(); }
 
 }; // class counter
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     std::string input_filename;
     std::string output_directory{"."};
     bool help = false;
 
-    const auto cli
+    // clang-format off
+    auto const cli
         = lyra::opt(output_directory, "DIR")
             ["-o"]["--output-dir"]
             ("output directory")
         | lyra::help(help)
         | lyra::arg(input_filename, "FILENAME")
             ("input file");
+    // clang-format on
 
-    const auto result = cli.parse(lyra::args(argc, argv));
+    auto const result = cli.parse(lyra::args(argc, argv));
     if (!result) {
         std::cerr << "Error in command line: " << result.message() << '\n';
         return 1;
     }
 
     if (help) {
-        std::cout << cli
-                  << "\nCreate statistics on duplicate segments.\n";
+        std::cout << cli << "\nCreate statistics on duplicate segments.\n";
         return 0;
     }
 
@@ -111,12 +112,12 @@ int main(int argc, char* argv[]) {
     {
         osmium::index::IdSetDense<osmium::unsigned_object_id_type> in_way;
         osmium::io::Reader reader1{input_file, osmium::osm_entity_bits::way};
-        while (const auto buffer = reader1.read()) {
-            for (const auto& way : buffer.select<osmium::Way>()) {
+        while (auto const buffer = reader1.read()) {
+            for (auto const &way : buffer.select<osmium::Way>()) {
                 if (way.nodes().empty()) {
                     continue;
                 }
-                const auto *it = way.nodes().begin();
+                auto const *it = way.nodes().begin();
                 if (way.is_closed()) {
                     ++it;
                 }
@@ -137,14 +138,15 @@ int main(int argc, char* argv[]) {
     std::vector<node_pair> segments;
 
     osmium::io::Reader reader2{input_file, osmium::osm_entity_bits::way};
-    while (const auto buffer = reader2.read()) {
-        for (const auto& way : buffer.select<osmium::Way>()) {
+    while (auto const buffer = reader2.read()) {
+        for (auto const &way : buffer.select<osmium::Way>()) {
             if (way.nodes().size() > 1) {
-                const auto *it = way.nodes().begin();
+                auto const *it = way.nodes().begin();
                 for (++it; it != way.nodes().end(); ++it) {
-                    const auto id1 = (it - 1)->ref();
-                    const auto id2 = it->ref();
-                    if (in_multiple_ways.get(id1) && in_multiple_ways.get(id2)) {
+                    auto const id1 = (it - 1)->ref();
+                    auto const id2 = it->ref();
+                    if (in_multiple_ways.get(id1) &&
+                        in_multiple_ways.get(id2)) {
                         segments.emplace_back(id1, id2);
                     }
                 }
@@ -163,7 +165,7 @@ int main(int argc, char* argv[]) {
     counter counts;
 
     for (auto it = segments.begin(); it != segments.end();) {
-        const auto a = std::adjacent_find(it, segments.end());
+        auto const a = std::adjacent_find(it, segments.end());
         if (a == segments.end()) {
             break;
         }
@@ -192,4 +194,3 @@ int main(int argc, char* argv[]) {
 
     vout << "Done.\n";
 }
-
