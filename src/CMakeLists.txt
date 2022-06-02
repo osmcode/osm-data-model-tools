@@ -10,6 +10,10 @@ add_executable(duplicate-segments duplicate-segments.cpp)
 target_link_libraries(duplicate-segments ${OSMIUM_IO_LIBRARIES})
 install(TARGETS duplicate-segments DESTINATION bin)
 
+add_executable(limits limits.cpp)
+target_link_libraries(limits ${OSMIUM_IO_LIBRARIES})
+install(TARGETS limits DESTINATION bin)
+
 add_executable(line-or-polygon line-or-polygon.cpp filter.cpp)
 target_link_libraries(line-or-polygon ${OSMIUM_IO_LIBRARIES})
 install(TARGETS line-or-polygon DESTINATION bin)

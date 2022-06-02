@@ -87,6 +87,12 @@ classify them as linear objects or area objects depending on the tags the
 way has. This is surprisingly complicated and there are several corner
 cases.
 
+### `limits`
+
+Create histograms for the number of nodes in ways, members in a relation, and
+lengths of tag keys, values and member roles. Also outputs PBF files with
+unsually long keys, values, roles, or unusually many tags.
+
 ### `mark-topo-nodes`
 
 Add tags to all nodes that don't have any tags and are in multiple ways or
