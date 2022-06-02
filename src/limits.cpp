@@ -41,12 +41,12 @@ static std::vector<std::size_t> hist_roles;
 static std::vector<std::size_t> hist_way_nodes;
 static std::vector<std::size_t> hist_members;
 
-void increment(std::vector<std::size_t> &hist, std::size_t len)
+void increment(std::vector<std::size_t> *hist, std::size_t len)
 {
-    if (hist.size() <= len) {
-        hist.resize(len + 1);
+    if (hist->size() <= len) {
+        hist->resize(len + 1);
     }
-    ++hist[len];
+    ++(*hist)[len];
 }
 
 void output_hist(std::string const &dir, char const *name,
@@ -71,8 +71,8 @@ check_limits(osmium::OSMObject const &object)
         auto const len_key = std::strlen(tag.key());
         auto const len_value = std::strlen(tag.value());
 
-        increment(hist_keys, len_key);
-        increment(hist_values, len_value);
+        increment(&hist_keys, len_key);
+        increment(&hist_values, len_value);
 
         tags_bytes += len_key;
         tags_bytes += len_value;
@@ -89,16 +89,16 @@ check_limits(osmium::OSMObject const &object)
     }
 
     if (object.type() == osmium::item_type::way) {
-        increment(hist_way_nodes,
+        increment(&hist_way_nodes,
                   static_cast<osmium::Way const &>(object).nodes().size());
     } else if (object.type() == osmium::item_type::relation) {
         auto const &members =
             static_cast<osmium::Relation const &>(object).members();
-        increment(hist_members, members.size());
+        increment(&hist_members, members.size());
         for (auto const &member : members) {
             auto const len = std::strlen(member.role());
 
-            increment(hist_roles, len);
+            increment(&hist_roles, len);
 
             if (len > max_len_roles) {
                 max_len_roles = len;
@@ -189,12 +189,12 @@ int main(int argc, char *argv[])
 
     while (auto const buffer = reader.read()) {
         for (auto const &object : buffer.select<osmium::OSMObject>()) {
-            increment(hist_tags_count, object.tags().size());
+            increment(&hist_tags_count, object.tags().size());
             if (object.tags().size() > max_tags_count) {
                 writer_tags_count(object);
             }
             auto [lk, lv, lr, tags_bytes, empty] = check_limits(object);
-            increment(hist_tags_bytes, tags_bytes);
+            increment(&hist_tags_bytes, tags_bytes);
             if (lk > max_key_length) {
                 writer_key_length(object);
             }
