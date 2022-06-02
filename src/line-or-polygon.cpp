@@ -83,7 +83,7 @@ osmium::TagsFilter filter_meta;
 osmium::TagsFilter filter_neutral;
 osmium::TagsFilter filter_import;
 
-lptype check_tag(osmium::Tag const &tag) noexcept
+lptype check_tag(osmium::Tag const &tag)
 {
     if (filter_polygon(tag)) {
         return lptype::polygon;
