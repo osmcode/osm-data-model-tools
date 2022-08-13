@@ -1,3 +1,4 @@
+**This repository is now archived. All the stuff in here went to [osmium-surplus](https://github.com/osmcode/osmium-surplus).**
 
 # OSM Data Model Tools
 
